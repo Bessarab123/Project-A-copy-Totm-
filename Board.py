@@ -25,6 +25,7 @@ class BoardEditor():
             for j in range(self.width):
                 width = 1 if self.board[i][j] == 0 else 0
                 pygame.draw.rect(screen, (255, 0, 255), (x, y, self.cell_size, self.cell_size), width)
+                # TODO Сделать красивае рисование с условиями
                 x += self.cell_size
             y += self.cell_size
 
