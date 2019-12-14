@@ -1,9 +1,14 @@
 import pygame
+import os
 
-WALL = 1
-EMPTY = 0
+WALL = 0
+EMPTY = 1
+EXIT = 3
+ENTER = 2
+COIN = 4
 
 class BoardEditor():
+
     def __init__(self, width, height):
         self.width = width
         self.height = height
@@ -23,7 +28,7 @@ class BoardEditor():
         for i in range(self.height):
             x = self.left
             for j in range(self.width):
-                width = 1 if self.board[i][j] == 0 else 0
+                width = 0 if self.board[i][j] == 0 else 1
                 pygame.draw.rect(screen, (255, 0, 255), (x, y, self.cell_size, self.cell_size), width)
                 # TODO Сделать красивае рисование с условиями
                 x += self.cell_size
@@ -31,10 +36,9 @@ class BoardEditor():
 
     def on_click(self, cell_coords):
         j, i = cell_coords
-        if self.board[i][j]:
-            self.board[i][j] = 0
-        else:
-            self.board[i][j] = 1
+        self.board[i][j] += 1
+        if self.board[i][j] == COIN + 1:
+            self.board[i][j] = WALL
 
     def get_click(self, mouse_pos):
         cell_coords = self.get_cell(mouse_pos)
@@ -51,6 +55,10 @@ class BoardEditor():
             return None
         return x1, y1
 
+def load_image(name):
+    fullname = os.path.join('data', name)
+    image = pygame.image.load(fullname).convert_alpha()
+    return image
 
 pygame.init()
 w = 800
