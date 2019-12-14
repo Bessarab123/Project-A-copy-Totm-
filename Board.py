@@ -7,13 +7,12 @@ EXIT = 3
 ENTER = 2
 COIN = 4
 
-class BoardEditor():
 
+class BoardEditor():
     def __init__(self, width, height):
         self.width = width
         self.height = height
         self.board = [[EMPTY] * width for _ in range(height)]
-        # значения по умолчанию
         self.left = 0
         self.top = 0
         self.cell_size = 30
@@ -28,9 +27,11 @@ class BoardEditor():
         for i in range(self.height):
             x = self.left
             for j in range(self.width):
-                width = 0 if self.board[i][j] == 0 else 1
-                pygame.draw.rect(screen, (255, 0, 255), (x, y, self.cell_size, self.cell_size), width)
-                # TODO Сделать красивае рисование с условиями
+                if self.board[i][j]:
+                    pass
+                else:
+                    pygame.draw.rect(screen, (255, 0, 255), (x, y, self.cell_size, self.cell_size), 0)
+                # TODO Сделать красивае рисование с условиями и спрайтами
                 x += self.cell_size
             y += self.cell_size
 
@@ -55,16 +56,22 @@ class BoardEditor():
             return None
         return x1, y1
 
+
+class Object(pygame.sprite.Sprite):
+
+
+
 def load_image(name):
     fullname = os.path.join('data', name)
     image = pygame.image.load(fullname).convert_alpha()
     return image
 
+
 pygame.init()
 w = 800
 h = 600
 screen = pygame.display.set_mode((w, h))
-board = BoardEditor(w // 30, h // 30)
+board = BoardEditor(w // 32, h // 32)
 running = True
 while running:
     for event in pygame.event.get():
