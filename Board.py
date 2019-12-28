@@ -1,6 +1,6 @@
-import random
 import pygame
 import os
+import random
 
 
 def level_editor(x, y, screen, clock):

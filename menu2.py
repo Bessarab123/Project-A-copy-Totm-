@@ -84,7 +84,7 @@ while running:
     elif runningStatus == 'levelgenerator':
         level_editor(20, 20, screen, clock)
     else:
-        # game code runningStatus == game or settings
+        # game code runningStatus == game or settings or levelgenerator
         pygame.draw.rect(screen, (155, 155, 155), ((0, 0), windowSize))
 
     pygame.display.flip()
