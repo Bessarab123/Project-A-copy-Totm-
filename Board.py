@@ -32,6 +32,8 @@ def level_editor(x, y, screen, clock):
             self.width = width
             self.height = height
             self.board = [[EMPTY] * width for _ in range(height)]
+            self.x = 0
+            self.y = 0
             self.cell_size = 32
 
         def set_cell_size(self, cell_size):
@@ -41,14 +43,15 @@ def level_editor(x, y, screen, clock):
         def get_cell_size(self):
             return self.cell_size
 
-        def render(self, screen):
+        def render(self):
+            '''Обновить все объекты на поле'''
             all_sprites.empty()
-            y = 0
+            y = self.y
             for i in range(self.height):
-                x = 0
+                x = self.x
                 for j in range(self.width):
                     if self.board[i][j]:
-                        # Если стена
+                        # Если не стена то:
                         if self.board[i][j] == COIN:
                             Coin(x, y, all_sprites)
                         elif self.board[i][j] == EXIT:
@@ -56,22 +59,23 @@ def level_editor(x, y, screen, clock):
                         elif self.board[i][j] == ENTER:
                             Enter(x, y, all_sprites)
                     else:
-                        # Если стена
+                        # Если стена:
                         self.kill_wall(i, j)
                         wall_sprites_dict[(i, j)] = []
                         # Логика того как должна прорисоваться стена
                         if j - 1 > -1 and self.board[i][j - 1]:
                             wall_sprites_dict[(i, j)].append(Wall(x, y, 270, all_sprites))
-                        if j + 1 < self.width + 1 and self.board[i][j + 1]:
+                        if j + 1 < self.width and self.board[i][j + 1]:
                             wall_sprites_dict[(i, j)].append(Wall(x, y, 90, all_sprites))
                         if i - 1 > - 1 and self.board[i - 1][j]:
                             wall_sprites_dict[(i, j)].append(Wall(x, y, 180, all_sprites))
-                        if i + 1 < self.height + 1 and self.board[i + 1][j]:
+                        if i + 1 < self.height and self.board[i + 1][j]:
                             wall_sprites_dict[(i, j)].append(Wall(x, y, 0, all_sprites))
                     x += self.cell_size
                 y += self.cell_size
 
         def on_click(self, cell_coords):
+            '''Определяет как должна реагировать клетка если на неё нажали'''
             j, i = cell_coords
             press = pygame.key.get_pressed()
             if any(press):
@@ -95,7 +99,7 @@ def level_editor(x, y, screen, clock):
                 self.board[i][j] += 1
                 if self.board[i][j] == COIN + 1:
                     self.board[i][j] = WALL
-            self.render(screen)
+            self.render()
 
         def get_click(self, mouse_pos):
             cell_coords = self.get_cell(mouse_pos)
@@ -103,7 +107,10 @@ def level_editor(x, y, screen, clock):
                 self.on_click(cell_coords)
 
         def get_cell(self, mouse_pos):
+            '''Получить координату клетки на поле на которую нажали'''
             x, y = mouse_pos
+            x -= self.x
+            y -= self.y
             x1 = x // self.cell_size
             y1 = y // self.cell_size
             if x1 < 0 or x1 >= self.width:
@@ -117,9 +124,46 @@ def level_editor(x, y, screen, clock):
                 for wall in wall_sprites_dict[(i, j)]:
                     wall.kill()
 
+        def save_board(self):
+            '''Сохраняет доску в "levels/new_save_board.txt"'''
+            board_str = '\n'.join(list(map(lambda x: ' '.join(map(str, x)), self.board)))
+            try:
+                file = open('levels/new_save_board.txt', mode='w')
+                file.write(board_str)
+                file.close()
+            except FileNotFoundError:
+                os.makedirs('levels')
+                file = open('levels/new_save_board.txt', mode='w')
+                file.write(board_str)
+                file.close()
+
+        def open_board(self, name):
+            '''Открывает доску из указанного файла'''
+            file = open('levels/' + name)
+            self.board = list(map(lambda x: list(map(int, x.split())), file.read().split('\n')))
+            self.width = len(self.board[0])
+            self.height = len(self.board)
+            file.close()
+            self.render()
+
+        def move_board(self, move):
+            if move == 'UP':
+                self.y -= self.cell_size
+            elif move == 'DOWN':
+                self.y += self.cell_size
+            elif move == 'RIGHT':
+                self.x += self.cell_size
+            elif move == 'LEFT':
+                self.x -= self.cell_size
+            elif move == 'remove':
+                self.x = 0
+                self.y = 0
+            self.render()
+
     board = BoardEditor(x, y)
 
     class Sprites(pygame.sprite.Sprite):
+        '''Общий класс всех спрайтов'''
         empty_im = load_image('Empty.png')
 
         def __init__(self, x, y, *group):
@@ -130,6 +174,7 @@ def level_editor(x, y, screen, clock):
             self.rect.y = y
 
     class Wall(Sprites):
+        '''Класс стены'''
         wall_1 = load_image('WALL_1.png')
         wall_2 = load_image('WALL_2.png')
 
@@ -138,6 +183,7 @@ def level_editor(x, y, screen, clock):
             self.image = pygame.transform.rotate(random.choice((Wall.wall_1, Wall.wall_2)), alpha)
 
     class Enter(Sprites):
+        '''Клласс входа'''
         enter_im = load_image('enter.png')
 
         def __init__(self, x, y, *group):
@@ -145,6 +191,7 @@ def level_editor(x, y, screen, clock):
             self.image = Enter.enter_im
 
     class Exit(Sprites):
+        '''Класс выхода'''
         exit_im_1 = load_image('exit1.png')
         exit_im_2 = load_image('exit2.png')
 
@@ -159,21 +206,38 @@ def level_editor(x, y, screen, clock):
                 self.image = Exit.exit_im_1
 
     class Coin(Sprites):
+        '''Класс монетки'''
         coin_im = load_image('coin.png')
 
         def __init__(self, x, y, *group):
             super().__init__(x, y, group)
             self.image = Coin.coin_im
 
-    running = True
-    while running:
+    while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                return
             elif event.type == pygame.MOUSEBUTTONUP:
                 board.get_click(event.pos)
             elif event.type == UPDATE_SPRITES:
                 all_sprites.update()
+            elif pygame.key.get_pressed()[pygame.K_s] and pygame.key.get_pressed()[pygame.K_LCTRL]:
+                board.save_board()
+            elif pygame.key.get_pressed()[pygame.K_UP]:
+                board.move_board('UP')
+            elif pygame.key.get_pressed()[pygame.K_DOWN]:
+                board.move_board('DOWN')
+            elif pygame.key.get_pressed()[pygame.K_RIGHT]:
+                board.move_board('RIGHT')
+            elif pygame.key.get_pressed()[pygame.K_LEFT]:
+                board.move_board('LEFT')
+            elif pygame.key.get_pressed()[pygame.K_r]:
+                board.move_board('remove')
+
         screen.fill(BLACK)
         all_sprites.draw(screen)
+        # Прямоугольник в котором можно работать
+        pygame.draw.rect(screen, (139, 0, 255),
+                         [board.x, board.y,
+                          board.cell_size * board.width, board.height * board.cell_size], 1)
         pygame.display.flip()

@@ -77,12 +77,13 @@ pygame.font.init()
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            running = False
+            terminate()
     pygame.draw.rect(screen, (255, 255, 255), ((0, 0), windowSize))
     if runningStatus == "menu":
         menu_buttons()
     elif runningStatus == 'levelgenerator':
-        level_editor(20, 20, screen, clock)
+        level_editor(5, 5, screen, clock)
+        runningStatus = 'menu'
     else:
         # game code runningStatus == game or settings or levelgenerator
         pygame.draw.rect(screen, (155, 155, 155), ((0, 0), windowSize))
