@@ -1,25 +1,30 @@
-from Player import Player
+from Player import create_player
 import pygame
 import os
 import random
 
+WALL = 0
+EMPTY = 1
+ENTER = 2
+EXIT = 3
+COIN = 4
+STEP = 1
+FPS = 120
+BLACK = pygame.Color('black')
+
 
 def main_cycle(name_file, two_players, screen, clock):
-    WALL = 0
-    EMPTY = 1
-    ENTER = 2
-    EXIT = 3
-    COIN = 4
-    BLACK = pygame.Color('black')
     UPDATE_SPRITES = 30
-    clock.set_timer(UPDATE_SPRITES, 1000)
-
-    STEP = 1
-    FPS = 60
+    pygame.time.set_timer(UPDATE_SPRITES, 1000)
 
     ENTER_POS = []
 
     all_sprites = pygame.sprite.Group()
+    player_group = pygame.sprite.Group()
+    exit_group = pygame.sprite.Group()
+    coin_group = pygame.sprite.Group()
+    wall_group = pygame.sprite.Group()
+
     wall_sprites_dict = dict()
     enter_sprites_dict = dict()
     exit_sprites_dict = dict()
@@ -57,9 +62,9 @@ def main_cycle(name_file, two_players, screen, clock):
                         # Если не стена то:
                         if self.board[i][j] == COIN:
                             Coin(x, y, all_sprites)
-                            coin_sprites_dict[(i, j)] = Coin(x, y, all_sprites)
+                            coin_sprites_dict[(i, j)] = Coin(x, y, all_sprites, coin_group)
                         elif self.board[i][j] == EXIT:
-                            exit_sprites_dict[(i, j)] = Exit(x, y, all_sprites)
+                            exit_sprites_dict[(i, j)] = Exit(x, y, all_sprites, exit_group)
                         elif self.board[i][j] == ENTER:
                             enter_sprites_dict[(i, j)] = Enter(x, y, all_sprites)
                     else:
@@ -68,13 +73,13 @@ def main_cycle(name_file, two_players, screen, clock):
                         wall_sprites_dict[(i, j)] = []
                         # Логика того как должна прорисоваться стена
                         if j - 1 > -1 and self.board[i][j - 1]:
-                            wall_sprites_dict[(i, j)].append(Wall(x, y, 270, all_sprites))
+                            wall_sprites_dict[(i, j)].append(Wall(x, y, 270, all_sprites, wall_group))
                         if j + 1 < self.width and self.board[i][j + 1]:
-                            wall_sprites_dict[(i, j)].append(Wall(x, y, 90, all_sprites))
+                            wall_sprites_dict[(i, j)].append(Wall(x, y, 90, all_sprites, wall_group))
                         if i - 1 > - 1 and self.board[i - 1][j]:
-                            wall_sprites_dict[(i, j)].append(Wall(x, y, 180, all_sprites))
+                            wall_sprites_dict[(i, j)].append(Wall(x, y, 180, all_sprites, wall_group))
                         if i + 1 < self.height and self.board[i + 1][j]:
-                            wall_sprites_dict[(i, j)].append(Wall(x, y, 0, all_sprites))
+                            wall_sprites_dict[(i, j)].append(Wall(x, y, 0, all_sprites, wall_group))
                     x += self.cell_size
                 y += self.cell_size
 
@@ -90,7 +95,8 @@ def main_cycle(name_file, two_players, screen, clock):
             self.width = len(self.board[0])
             self.height = len(self.board)
             file.close()
-            self.render()
+
+    board = Board(name_file)
 
     class Sprites(pygame.sprite.Sprite):
         '''Общий класс всех спрайтов'''
@@ -153,17 +159,37 @@ def main_cycle(name_file, two_players, screen, clock):
             super().__init__(x, y, group)
             self.image = Coin.coin_im
 
-    board = Board(name_file)
-    list_cell_pos_enter = list(map(lambda x: (x[0] * board.get_cell_size(), x[1] * board.get_cell_size()),enter_sprites_dict.keys()))
-    player_list = [Player(random.choices(list_cell_pos_enter))]
+    board.render()
+    list_cell_pos_enter = list(
+        map(lambda x: (x[1] * board.get_cell_size(), x[0] * board.get_cell_size()), enter_sprites_dict.keys()))
+    player_list = [create_player(board, random.choice(list_cell_pos_enter), player_group, all_sprites)]
     if two_players:
-        player_list.append(Player(random.choices(list_cell_pos_enter)))
+        player_list.append(create_player(board, random.choice(list_cell_pos_enter), player_group, all_sprites))
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
             elif event.type == UPDATE_SPRITES:
                 all_sprites.update()
+            elif pygame.key.get_pressed()[pygame.K_UP]:
+                if not player_list[0].move:
+                    player_list[0].set_move(True, 'UP')
+            elif pygame.key.get_pressed()[pygame.K_DOWN]:
+                if not player_list[0].move:
+                    player_list[0].set_move(True, 'DOWN')
+            elif pygame.key.get_pressed()[pygame.K_RIGHT]:
+                if not player_list[0].move:
+                    player_list[0].set_move(True, 'RIGHT')
+            elif pygame.key.get_pressed()[pygame.K_LEFT]:
+                if not player_list[0].move:
+                    player_list[0].set_move(True, 'LEFT')
+
+
+        if pygame.sprite.spritecollide(player_list[0], wall_group, False):
+            player_list[0].step_back()
+            player_list[0].set_move(False)
+        player_list[0].moves()
 
         screen.fill(BLACK)
         all_sprites.draw(screen)

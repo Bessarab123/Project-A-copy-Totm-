@@ -1,6 +1,7 @@
 import pygame
 import sys
 from Board import level_editor
+from main_game import main_cycle
 
 WIDTH = 500
 HEIGHT = 500
@@ -69,7 +70,7 @@ def menu_levelGenerator():
 
 
 pygame.init()
-clock = pygame.time
+clock = pygame.time.Clock()
 running = True
 windowSize = (WIDTH, HEIGHT)
 screen = pygame.display.set_mode(windowSize)
@@ -81,9 +82,12 @@ while running:
     pygame.draw.rect(screen, (255, 255, 255), ((0, 0), windowSize))
     if runningStatus == "menu":
         menu_buttons()
-    elif runningStatus == 'levelgenerator':
+    elif runningStatus == "game":
+        main_cycle("new_save_board.txt", False, screen, clock)
+        runningStatus = "menu"
+    elif runningStatus == "levelgenerator":
         level_editor(5, 5, screen, clock)
-        runningStatus = 'menu'
+        runningStatus = "menu"
     else:
         # game code runningStatus == game or settings or levelgenerator
         pygame.draw.rect(screen, (155, 155, 155), ((0, 0), windowSize))
