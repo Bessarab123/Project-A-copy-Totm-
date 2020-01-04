@@ -83,7 +83,7 @@ while running:
     if runningStatus == "menu":
         menu_buttons()
     elif runningStatus == "game":
-        main_cycle("new_save_board.txt", False, screen, clock)
+        main_cycle("new_save_board.txt", True, screen, clock)
         runningStatus = "menu"
     elif runningStatus == "levelgenerator":
         level_editor(5, 5, screen, clock)

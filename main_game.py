@@ -9,15 +9,15 @@ ENTER = 2
 EXIT = 3
 COIN = 4
 STEP = 1
-FPS = 120
+FPS = 240
 BLACK = pygame.Color('black')
 
 
 def main_cycle(name_file, two_players, screen, clock):
+    width = screen.get_rect().w
+    height = screen.get_rect().h
     UPDATE_SPRITES = 30
     pygame.time.set_timer(UPDATE_SPRITES, 1000)
-
-    ENTER_POS = []
 
     all_sprites = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
@@ -61,7 +61,6 @@ def main_cycle(name_file, two_players, screen, clock):
                     if self.board[i][j]:
                         # Если не стена то:
                         if self.board[i][j] == COIN:
-                            Coin(x, y, all_sprites)
                             coin_sprites_dict[(i, j)] = Coin(x, y, all_sprites, coin_group)
                         elif self.board[i][j] == EXIT:
                             exit_sprites_dict[(i, j)] = Exit(x, y, all_sprites, exit_group)
@@ -69,7 +68,6 @@ def main_cycle(name_file, two_players, screen, clock):
                             enter_sprites_dict[(i, j)] = Enter(x, y, all_sprites)
                     else:
                         # Если стена:
-                        self.kill_wall(i, j)
                         wall_sprites_dict[(i, j)] = []
                         # Логика того как должна прорисоваться стена
                         if j - 1 > -1 and self.board[i][j - 1]:
@@ -82,11 +80,6 @@ def main_cycle(name_file, two_players, screen, clock):
                             wall_sprites_dict[(i, j)].append(Wall(x, y, 0, all_sprites, wall_group))
                     x += self.cell_size
                 y += self.cell_size
-
-        def kill_wall(self, i, j):
-            if (i, j) in wall_sprites_dict.keys():
-                for wall in wall_sprites_dict[(i, j)]:
-                    wall.kill()
 
         def open_board(self, name):
             '''Открывает доску из указанного файла'''
@@ -158,14 +151,35 @@ def main_cycle(name_file, two_players, screen, clock):
         def __init__(self, x, y, *group):
             super().__init__(x, y, group)
             self.image = Coin.coin_im
+            self.mask = pygame.mask.from_surface(self.image)
+
+    class Camera:
+        # зададим начальный сдвиг камеры
+        def __init__(self):
+            self.dx = 1
+            self.dy = 1
+
+        # сдвинуть объект obj на смещение камеры
+        def apply(self, obj):
+            obj.rect.x += self.dx
+            obj.rect.y += self.dy
+
+        # позиционировать камеру на объекте target
+        def update(self, target):
+            self.dx = -(target.rect.x + target.rect.w // 2 - width // 2)
+            self.dy = -(target.rect.y + target.rect.h // 2 - height // 2)
+
+        def update2(self, x, y):
+            self.dx = -(x - width // 2)
+            self.dy = -(y - height // 2)
 
     board.render()
     list_cell_pos_enter = list(
         map(lambda x: (x[1] * board.get_cell_size(), x[0] * board.get_cell_size()), enter_sprites_dict.keys()))
-    player_list = [create_player(board, random.choice(list_cell_pos_enter), player_group, all_sprites)]
+    plr_list = [create_player(board, random.choice(list_cell_pos_enter), 0, player_group, all_sprites)]
     if two_players:
-        player_list.append(create_player(board, random.choice(list_cell_pos_enter), player_group, all_sprites))
-
+        plr_list.append(create_player(board, random.choice(list_cell_pos_enter), 1, player_group, all_sprites))
+    camera = Camera()
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -173,29 +187,53 @@ def main_cycle(name_file, two_players, screen, clock):
             elif event.type == UPDATE_SPRITES:
                 all_sprites.update()
             elif pygame.key.get_pressed()[pygame.K_UP]:
-                if not player_list[0].move:
-                    player_list[0].set_move(True, 'UP')
+                if not plr_list[0].move:
+                    plr_list[0].set_move(True, 'UP')
             elif pygame.key.get_pressed()[pygame.K_DOWN]:
-                if not player_list[0].move:
-                    player_list[0].set_move(True, 'DOWN')
+                if not plr_list[0].move:
+                    plr_list[0].set_move(True, 'DOWN')
             elif pygame.key.get_pressed()[pygame.K_RIGHT]:
-                if not player_list[0].move:
-                    player_list[0].set_move(True, 'RIGHT')
+                if not plr_list[0].move:
+                    plr_list[0].set_move(True, 'RIGHT')
             elif pygame.key.get_pressed()[pygame.K_LEFT]:
-                if not player_list[0].move:
-                    player_list[0].set_move(True, 'LEFT')
+                if not plr_list[0].move:
+                    plr_list[0].set_move(True, 'LEFT')
+            if two_players:
+                if pygame.key.get_pressed()[pygame.K_w]:
+                    if not plr_list[1].move:
+                        plr_list[1].set_move(True, 'UP')
+                elif pygame.key.get_pressed()[pygame.K_s]:
+                    if not plr_list[1].move:
+                        plr_list[1].set_move(True, 'DOWN')
+                elif pygame.key.get_pressed()[pygame.K_d]:
+                    if not plr_list[1].move:
+                        plr_list[1].set_move(True, 'RIGHT')
+                elif pygame.key.get_pressed()[pygame.K_a]:
+                    if not plr_list[1].move:
+                        plr_list[1].set_move(True, 'LEFT')
 
+        if pygame.sprite.spritecollide(plr_list[0], wall_group, False):
+            plr_list[0].step_back()
+            plr_list[0].set_move(False)
+        if pygame.sprite.spritecollide(plr_list[1], wall_group, False):
+            plr_list[1].step_back()
+            plr_list[1].set_move(False)
 
-        if pygame.sprite.spritecollide(player_list[0], wall_group, False):
-            player_list[0].step_back()
-            player_list[0].set_move(False)
-        player_list[0].moves()
+        for coin in coin_group:
+            if pygame.sprite.collide_mask(plr_list[0], coin):
+                coin.kill()
+        plr_list[0].moves()
+        plr_list[1].moves()
+        if two_players:
+            camera.update2((plr_list[0].rect.x + plr_list[1].rect.x) // 2,
+                           (plr_list[0].rect.y + plr_list[1].rect.y) // 2)
+        else:
+            camera.update(plr_list[0])
+        for sprite in all_sprites:
+            camera.apply(sprite)
 
         screen.fill(BLACK)
         all_sprites.draw(screen)
         # Прямоугольник в котором можно работать
-        pygame.draw.rect(screen, (139, 0, 255),
-                         [board.x, board.y,
-                          board.cell_size * board.width, board.height * board.cell_size], 1)
         clock.tick(FPS)
         pygame.display.flip()

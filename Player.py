@@ -2,7 +2,7 @@ import pygame
 import os
 
 
-def create_player(board, player_pos, player_group, all_sprites):
+def create_player(board, player_pos, flag, player_group, all_sprites):
     def load_image(name):
         fullname = os.path.join('data', name)
         image = pygame.image.load(fullname).convert()
@@ -81,4 +81,4 @@ def create_player(board, player_pos, player_group, all_sprites):
                 elif self.image is self.image23:
                     self.image = self.image20
 
-    return Player(player_pos)
+    return Player(player_pos, flag)
