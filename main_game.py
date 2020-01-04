@@ -1,12 +1,10 @@
+from Player import Player
 import pygame
 import os
 import random
 
 
-def level_editor(x, y, screen, clock):
-    '''Создать редактор уровня принимает
-    x, y размеры поля
-    screen, clock'''
+def main_cycle(name_file, two_players, screen, clock):
     WALL = 0
     EMPTY = 1
     ENTER = 2
@@ -16,8 +14,16 @@ def level_editor(x, y, screen, clock):
     UPDATE_SPRITES = 30
     clock.set_timer(UPDATE_SPRITES, 1000)
 
+    STEP = 1
+    FPS = 60
+
+    ENTER_POS = []
+
     all_sprites = pygame.sprite.Group()
     wall_sprites_dict = dict()
+    enter_sprites_dict = dict()
+    exit_sprites_dict = dict()
+    coin_sprites_dict = dict()
 
     def load_image(name):
         fullname = os.path.join('data', name)
@@ -26,14 +32,12 @@ def level_editor(x, y, screen, clock):
         image.set_colorkey(BLACK)
         return image
 
-    class BoardEditor():
-        def __init__(self, width, height):
-            self.width = width
-            self.height = height
-            self.board = [[EMPTY] * width for _ in range(height)]
+    class Board:
+        def __init__(self, name):
             self.x = 0
             self.y = 0
             self.cell_size = 32
+            self.open_board(name)
 
         def set_cell_size(self, cell_size):
             '''Изменить размер клетки'''
@@ -53,10 +57,11 @@ def level_editor(x, y, screen, clock):
                         # Если не стена то:
                         if self.board[i][j] == COIN:
                             Coin(x, y, all_sprites)
+                            coin_sprites_dict[(i, j)] = Coin(x, y, all_sprites)
                         elif self.board[i][j] == EXIT:
-                            Exit(x, y, all_sprites)
+                            exit_sprites_dict[(i, j)] = Exit(x, y, all_sprites)
                         elif self.board[i][j] == ENTER:
-                            Enter(x, y, all_sprites)
+                            enter_sprites_dict[(i, j)] = Enter(x, y, all_sprites)
                     else:
                         # Если стена:
                         self.kill_wall(i, j)
@@ -73,68 +78,10 @@ def level_editor(x, y, screen, clock):
                     x += self.cell_size
                 y += self.cell_size
 
-        def on_click(self, cell_coords):
-            '''Определяет как должна реагировать клетка если на неё нажали'''
-            j, i = cell_coords
-            press = pygame.key.get_pressed()
-            if any(press):
-                # Если нажата хоть одна клавиша
-                if press[pygame.K_0]:
-                    self.board[i][j] = 0
-                elif press[pygame.K_1]:
-                    wall_sprites_dict[(i, j)] = []
-                    self.board[i][j] = 1
-                elif press[pygame.K_2]:
-                    wall_sprites_dict[(i, j)] = []
-                    self.board[i][j] = 2
-                elif press[pygame.K_3]:
-                    wall_sprites_dict[(i, j)] = []
-                    self.board[i][j] = 3
-                elif press[pygame.K_4]:
-                    wall_sprites_dict[(i, j)] = []
-                    self.board[i][j] = 4
-            else:
-                # Если ни одна клавиша не нажата
-                self.board[i][j] += 1
-                if self.board[i][j] == COIN + 1:
-                    self.board[i][j] = WALL
-            self.render()
-
-        def get_click(self, mouse_pos):
-            cell_coords = self.get_cell(mouse_pos)
-            if cell_coords:
-                self.on_click(cell_coords)
-
-        def get_cell(self, mouse_pos):
-            '''Получить координату клетки на поле на которую нажали'''
-            x, y = mouse_pos
-            x -= self.x
-            y -= self.y
-            x1 = x // self.cell_size
-            y1 = y // self.cell_size
-            if x1 < 0 or x1 >= self.width:
-                return None
-            if y1 < 0 or y1 >= self.height:
-                return None
-            return x1, y1
-
         def kill_wall(self, i, j):
             if (i, j) in wall_sprites_dict.keys():
                 for wall in wall_sprites_dict[(i, j)]:
                     wall.kill()
-
-        def save_board(self):
-            '''Сохраняет доску в "levels/new_save_board.txt"'''
-            board_str = '\n'.join(list(map(lambda x: ' '.join(map(str, x)), self.board)))
-            try:
-                file = open('levels/new_save_board.txt', mode='w')
-                file.write(board_str)
-                file.close()
-            except FileNotFoundError:
-                os.makedirs('levels')
-                file = open('levels/new_save_board.txt', mode='w')
-                file.write(board_str)
-                file.close()
 
         def open_board(self, name):
             '''Открывает доску из указанного файла'''
@@ -144,22 +91,6 @@ def level_editor(x, y, screen, clock):
             self.height = len(self.board)
             file.close()
             self.render()
-
-        def move_board(self, move):
-            if move == 'UP':
-                self.y -= self.cell_size
-            elif move == 'DOWN':
-                self.y += self.cell_size
-            elif move == 'RIGHT':
-                self.x += self.cell_size
-            elif move == 'LEFT':
-                self.x -= self.cell_size
-            elif move == 'remove':
-                self.x = 0
-                self.y = 0
-            self.render()
-
-    board = BoardEditor(x, y)
 
     class Sprites(pygame.sprite.Sprite):
         '''Общий класс всех спрайтов'''
@@ -171,6 +102,16 @@ def level_editor(x, y, screen, clock):
             self.rect = self.image.get_rect()
             self.rect.x = x
             self.rect.y = y
+
+        def move_sprite(self, move):
+            if move == 'UP':
+                self.y -= STEP
+            elif move == 'DOWN':
+                self.y += STEP
+            elif move == 'RIGHT':
+                self.x += STEP
+            elif move == 'LEFT':
+                self.x -= STEP
 
     class Wall(Sprites):
         '''Класс стены'''
@@ -212,26 +153,17 @@ def level_editor(x, y, screen, clock):
             super().__init__(x, y, group)
             self.image = Coin.coin_im
 
+    board = Board(name_file)
+    list_cell_pos_enter = list(map(lambda x: (x[0] * board.get_cell_size(), x[1] * board.get_cell_size()),enter_sprites_dict.keys()))
+    player_list = [Player(random.choices(list_cell_pos_enter))]
+    if two_players:
+        player_list.append(Player(random.choices(list_cell_pos_enter)))
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
-            elif event.type == pygame.MOUSEBUTTONUP:
-                board.get_click(event.pos)
             elif event.type == UPDATE_SPRITES:
                 all_sprites.update()
-            elif pygame.key.get_pressed()[pygame.K_s] and pygame.key.get_pressed()[pygame.K_LCTRL]:
-                board.save_board()
-            elif pygame.key.get_pressed()[pygame.K_UP]:
-                board.move_board('UP')
-            elif pygame.key.get_pressed()[pygame.K_DOWN]:
-                board.move_board('DOWN')
-            elif pygame.key.get_pressed()[pygame.K_RIGHT]:
-                board.move_board('RIGHT')
-            elif pygame.key.get_pressed()[pygame.K_LEFT]:
-                board.move_board('LEFT')
-            elif pygame.key.get_pressed()[pygame.K_r]:
-                board.move_board('remove')
 
         screen.fill(BLACK)
         all_sprites.draw(screen)
@@ -239,4 +171,5 @@ def level_editor(x, y, screen, clock):
         pygame.draw.rect(screen, (139, 0, 255),
                          [board.x, board.y,
                           board.cell_size * board.width, board.height * board.cell_size], 1)
+        clock.tick(FPS)
         pygame.display.flip()
