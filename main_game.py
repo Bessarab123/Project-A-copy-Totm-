@@ -222,11 +222,14 @@ def main_cycle(name_file, two_players, screen, clock):
         for coin in coin_group:
             if pygame.sprite.collide_mask(plr_list[0], coin):
                 coin.kill()
+                # Можно вести подсчёт очков
+            if pygame.sprite.collide_mask(plr_list[1], coin):
+                coin.kill()
         plr_list[0].moves()
         plr_list[1].moves()
         if two_players:
-            camera.update2((plr_list[0].rect.x + plr_list[1].rect.x) // 2,
-                           (plr_list[0].rect.y + plr_list[1].rect.y) // 2)
+            camera.update2((plr_list[0].rect.x + plr_list[1].rect.x + board.get_cell_size()) // 2,
+                           (plr_list[0].rect.y + plr_list[1].rect.y + board.get_cell_size()) // 2)
         else:
             camera.update(plr_list[0])
         for sprite in all_sprites:
