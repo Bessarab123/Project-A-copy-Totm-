@@ -14,11 +14,10 @@ def level_editor(x, y, screen, clock, fileName):
     COIN = 4
     BLACK = pygame.Color('black')
     UPDATE_SPRITES = 30
+    pygame.time.set_timer(UPDATE_SPRITES, 1000)
 
     all_sprites = pygame.sprite.Group()
     wall_sprites_dict = dict()
-
-    clock.set_timer(UPDATE_SPRITES, 1000)
 
     def load_image(name):
         fullname = os.path.join('data', name)
@@ -240,4 +239,5 @@ def level_editor(x, y, screen, clock, fileName):
         pygame.draw.rect(screen, (139, 0, 255),
                          [board.x, board.y,
                           board.cell_size * board.width, board.height * board.cell_size], 1)
+        clock.tick(60)
         pygame.display.flip()
