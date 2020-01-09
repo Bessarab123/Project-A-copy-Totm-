@@ -3,7 +3,7 @@ import os
 import random
 
 
-def level_editor(x, y, screen, clock):
+def level_editor(x, y, screen, clock, fileName):
     '''Создать редактор уровня принимает
     x, y размеры поля
     screen, clock'''
