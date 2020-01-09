@@ -143,7 +143,6 @@ def level_editor(x, y, screen, clock, fileName):
             self.width = len(self.board[0])
             self.height = len(self.board)
             file.close()
-            self.render()
 
         def move_board(self, move):
             if move == 'UP':
@@ -160,6 +159,8 @@ def level_editor(x, y, screen, clock, fileName):
             self.render()
 
     board = BoardEditor(x, y)
+    if fileName != '':
+        board.open_board(fileName)
 
     class Sprites(pygame.sprite.Sprite):
         '''Общий класс всех спрайтов'''
