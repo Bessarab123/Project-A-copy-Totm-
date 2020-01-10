@@ -12,12 +12,19 @@ def text_objects(text, font):
     return textSurface, textSurface.get_rect()
 
 
-def draw_button(screen, msg, buttonLeft, buttonTop, action=None, actionParam=None):
+def draw_text(screen, msg, x, y, width):
+    smallText = pygame.font.SysFont("comicsansms", 20)
+    textSurf, textRect = text_objects(msg, smallText)
+    textRect.center = ((x + (width // 2)), (y + (MENUBUTTONHEIGHT // 2)))
+    screen.blit(textSurf, textRect)
+
+
+def draw_button(screen, msg, buttonLeft, buttonTop, buttonWidth, action=None, actionParam=None):
     x = buttonLeft
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
-    if x + MENUBUTTONWIDTH > mouse[0] > x and buttonTop + MENUBUTTONHEIGHT > mouse[1] > buttonTop:
-        pygame.draw.rect(screen, MENUACTIVECOLOR, (x, buttonTop, MENUBUTTONWIDTH, MENUBUTTONHEIGHT))
+    if x +  buttonWidth > mouse[0] > x and buttonTop + MENUBUTTONHEIGHT > mouse[1] > buttonTop:
+        pygame.draw.rect(screen, MENUACTIVECOLOR, (x, buttonTop, buttonWidth, MENUBUTTONHEIGHT))
 
         if click[0] == 1 and action != None:
             if actionParam != None:
@@ -25,14 +32,10 @@ def draw_button(screen, msg, buttonLeft, buttonTop, action=None, actionParam=Non
             else:
                 action()
     else:
-        pygame.draw.rect(screen, MENUINACTIVECOLOR, (x, buttonTop, MENUBUTTONWIDTH, MENUBUTTONHEIGHT))
-
-    smallText = pygame.font.SysFont("comicsansms", 20)
-    textSurf, textRect = text_objects(msg, smallText)
-    textRect.center = ((x + (MENUBUTTONWIDTH // 2)), (buttonTop + (MENUBUTTONHEIGHT // 2)))
-    screen.blit(textSurf, textRect)
+        pygame.draw.rect(screen, MENUINACTIVECOLOR, (x, buttonTop, buttonWidth, MENUBUTTONHEIGHT))
+    draw_text(screen, msg, x, buttonTop, buttonWidth)
 
 
 def menu_button(screen, msg, buttonTop, action=None):
     x = (WIDTH - MENUBUTTONWIDTH) // 2
-    draw_button(screen, msg, x, buttonTop, action)
+    draw_button(screen, msg, x, buttonTop,MENUBUTTONWIDTH, action)
