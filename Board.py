@@ -124,17 +124,22 @@ def level_editor(x, y, screen, clock, fileName, size):
                     wall.kill()
 
         def save_board(self):
-            '''Сохраняет доску в "levels/new_save_board.txt"'''
+            '''Сохраняет доску в "levels/new_save_board.txt или в fileName"'''
             board_str = '\n'.join(list(map(lambda x: ' '.join(map(str, x)), self.board)))
-            try:
-                file = open('levels/new_save_board.txt', mode='w')
+            if fileName != '':
+                file = open('levels/' + fileName, mode='w')
                 file.write(board_str)
                 file.close()
-            except FileNotFoundError:
-                os.makedirs('levels')
-                file = open('levels/new_save_board.txt', mode='w')
-                file.write(board_str)
-                file.close()
+            else:
+                try:
+                    file = open('levels/new_save_board.txt', mode='w')
+                    file.write(board_str)
+                    file.close()
+                except FileNotFoundError:
+                    os.makedirs('levels')
+                    file = open('levels/new_save_board.txt', mode='w')
+                    file.write(board_str)
+                    file.close()
 
         def open_board(self, name):
             '''Открывает доску из указанного файла'''
@@ -143,7 +148,6 @@ def level_editor(x, y, screen, clock, fileName, size):
             self.width = len(self.board[0])
             self.height = len(self.board)
             file.close()
-            self.render()
 
         def move_board(self, move):
             if move == 'UP':
@@ -160,6 +164,8 @@ def level_editor(x, y, screen, clock, fileName, size):
             self.render()
 
     board = BoardEditor(x, y)
+    if fileName != '':
+        board.open_board(fileName)
 
     class Sprites(pygame.sprite.Sprite):
         '''Общий класс всех спрайтов'''
@@ -212,6 +218,7 @@ def level_editor(x, y, screen, clock, fileName, size):
             super().__init__(x, y, group)
             self.image = Coin.coin_im
 
+    board.render()
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

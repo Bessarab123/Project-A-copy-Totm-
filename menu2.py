@@ -54,7 +54,7 @@ while running:
         main_cycle("new_save_board.txt", True, screen, clock)
         runningStatus = "menu"
     elif runningStatus == 'levelchooser':
-        level_chooser(screen,clock)
+        level_chooser(screen, clock)
         runningStatus = 'menu'
     else:
         # game code runningStatus == game or settings or levelgenerator
