@@ -53,7 +53,7 @@ def level_chooser(screen, clock):
                 running = False
                 fileName = event.file
                 size = event.size
-                level_editor(5, 5, screen, clock, fileName, size)
+                level_editor(size, size, screen, clock, fileName)
 
         pygame.draw.rect(screen, (255, 255, 255), ((0, 0), windowSize))
         menu_buttons()

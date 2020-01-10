@@ -198,6 +198,10 @@ def main_cycle(name_file, two_players, screen, clock):
             elif pygame.key.get_pressed()[pygame.K_LEFT]:
                 if not plr_list[0].move:
                     plr_list[0].set_move(True, 'LEFT')
+            elif pygame.key.get_pressed()[pygame.K_ESCAPE]:
+                screen = pygame.display.set_mode((width, height))
+            elif pygame.key.get_pressed()[pygame.K_f]:
+                screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
             if two_players:
                 if pygame.key.get_pressed()[pygame.K_w]:
                     if not plr_list[1].move:
@@ -215,7 +219,7 @@ def main_cycle(name_file, two_players, screen, clock):
         if pygame.sprite.spritecollide(plr_list[0], wall_group, False):
             plr_list[0].step_back()
             plr_list[0].set_move(False)
-        if pygame.sprite.spritecollide(plr_list[1], wall_group, False):
+        if two_players and pygame.sprite.spritecollide(plr_list[1], wall_group, False):
             plr_list[1].step_back()
             plr_list[1].set_move(False)
 
@@ -223,11 +227,11 @@ def main_cycle(name_file, two_players, screen, clock):
             if pygame.sprite.collide_mask(plr_list[0], coin):
                 coin.kill()
                 # Можно вести подсчёт очков
-            if pygame.sprite.collide_mask(plr_list[1], coin):
+            if two_players and pygame.sprite.collide_mask(plr_list[1], coin):
                 coin.kill()
         plr_list[0].moves()
-        plr_list[1].moves()
         if two_players:
+            plr_list[1].moves()
             camera.update2((plr_list[0].rect.x + plr_list[1].rect.x + board.get_cell_size()) // 2,
                            (plr_list[0].rect.y + plr_list[1].rect.y + board.get_cell_size()) // 2)
         else:
