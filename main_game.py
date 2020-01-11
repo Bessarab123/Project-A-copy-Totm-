@@ -102,16 +102,6 @@ def main_cycle(name_file, two_players, screen, clock):
             self.rect.x = x
             self.rect.y = y
 
-        def move_sprite(self, move):
-            if move == 'UP':
-                self.y -= STEP
-            elif move == 'DOWN':
-                self.y += STEP
-            elif move == 'RIGHT':
-                self.x += STEP
-            elif move == 'LEFT':
-                self.x -= STEP
-
     class Wall(Sprites):
         '''Класс стены'''
         wall_1 = load_image('WALL_1.png')
