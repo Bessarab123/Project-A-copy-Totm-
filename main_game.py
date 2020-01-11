@@ -196,6 +196,7 @@ def main_cycle(name_file, two_players, screen, clock):
                 all_sprites.update()
             elif pygame.key.get_pressed()[pygame.K_ESCAPE]:
                 screen = pygame.display.set_mode((width, height))
+                return
             elif pygame.key.get_pressed()[pygame.K_f]:
                 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
             # Определить направление движения
