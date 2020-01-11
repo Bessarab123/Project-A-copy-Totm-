@@ -1,5 +1,6 @@
 import pygame
 import sys
+import os
 from consts import *
 from menu_button import *
 from level_chooser import level_chooser
@@ -51,9 +52,15 @@ while running:
     if runningStatus == "menu":
         menu_buttons()
     elif runningStatus == "game":
-        main_cycle("new_save_board.txt", False, screen, clock)
+        main_cycle("new_save_board.txt", True, screen, clock)
         runningStatus = "menu"
     elif runningStatus == 'levelchooser':
+        try:
+            open('levels')
+        except PermissionError:
+            pass
+        except FileNotFoundError:
+            os.makedirs('levels')
         level_chooser(screen, clock)
         runningStatus = 'menu'
     else:

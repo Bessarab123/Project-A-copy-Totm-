@@ -15,6 +15,9 @@ def level_editor(x, y, screen, clock, fileName):
     BLACK = pygame.Color('black')
     UPDATE_SPRITES = 30
     pygame.time.set_timer(UPDATE_SPRITES, 1000)
+    width = screen.get_rect().w
+    height = screen.get_rect().h
+    screen = pygame.display.set_mode((2000, 2000), pygame.RESIZABLE)
 
     all_sprites = pygame.sprite.Group()
     wall_sprites_dict = dict()
@@ -131,15 +134,10 @@ def level_editor(x, y, screen, clock, fileName):
                 file.write(board_str)
                 file.close()
             else:
-                try:
-                    file = open('levels/new_save_board.txt', mode='w')
-                    file.write(board_str)
-                    file.close()
-                except FileNotFoundError:
-                    os.makedirs('levels')
-                    file = open('levels/new_save_board.txt', mode='w')
-                    file.write(board_str)
-                    file.close()
+                file = open('levels/new_save_board.txt', mode='w')
+                file.write(board_str)
+                file.close()
+
 
         def open_board(self, name):
             '''Открывает доску из указанного файла'''
@@ -222,23 +220,28 @@ def level_editor(x, y, screen, clock, fileName):
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                pygame.display.set_mode((width, height))
                 return
             elif event.type == pygame.MOUSEBUTTONUP:
                 board.get_click(event.pos)
             elif event.type == UPDATE_SPRITES:
                 all_sprites.update()
-            elif pygame.key.get_pressed()[pygame.K_s] and pygame.key.get_pressed()[pygame.K_LCTRL]:
-                board.save_board()
-            elif pygame.key.get_pressed()[pygame.K_UP]:
-                board.move_board('UP')
-            elif pygame.key.get_pressed()[pygame.K_DOWN]:
-                board.move_board('DOWN')
-            elif pygame.key.get_pressed()[pygame.K_RIGHT]:
-                board.move_board('RIGHT')
-            elif pygame.key.get_pressed()[pygame.K_LEFT]:
-                board.move_board('LEFT')
-            elif pygame.key.get_pressed()[pygame.K_r]:
-                board.move_board('remove')
+            if event.type == pygame.KEYDOWN:
+                if pygame.key.get_pressed()[pygame.K_s] and pygame.key.get_pressed()[pygame.K_LCTRL]:
+                    board.save_board()
+                elif pygame.key.get_pressed()[pygame.K_UP]:
+                    board.move_board('UP')
+                elif pygame.key.get_pressed()[pygame.K_DOWN]:
+                    board.move_board('DOWN')
+                elif pygame.key.get_pressed()[pygame.K_RIGHT]:
+                    board.move_board('RIGHT')
+                elif pygame.key.get_pressed()[pygame.K_LEFT]:
+                    board.move_board('LEFT')
+                elif pygame.key.get_pressed()[pygame.K_r]:
+                    board.move_board('remove')
+                elif pygame.key.get_pressed()[pygame.K_ESCAPE]:
+                    pygame.display.set_mode((width, height))
+                    return
 
         screen.fill(BLACK)
         all_sprites.draw(screen)
