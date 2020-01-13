@@ -4,7 +4,7 @@ from os.path import isfile, join
 import sys
 from menu_button import *
 from consts import *
-from Board import level_editor
+from level_editor import level_editor
 
 
 def level_chooser(screen, clock):

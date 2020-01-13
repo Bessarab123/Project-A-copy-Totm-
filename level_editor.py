@@ -222,7 +222,7 @@ def level_editor(x, y, screen, clock, fileName):
             if event.type == pygame.QUIT:
                 pygame.display.set_mode((width, height))
                 return
-            elif event.type == pygame.MOUSEBUTTONUP:
+            elif event.type == pygame.MOUSEBUTTONDOWN:
                 board.get_click(event.pos)
             elif event.type == UPDATE_SPRITES:
                 all_sprites.update()
