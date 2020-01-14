@@ -13,7 +13,7 @@ FPS = 240
 BLACK = pygame.Color('black')
 
 
-def main_cycle(name_file, two_players, screen, clock):
+def main_cycle(name_file, two_players, size, screen, clock):
     width = screen.get_rect().w
     height = screen.get_rect().h
     UPDATE_SPRITES = 30

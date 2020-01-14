@@ -36,6 +36,6 @@ def draw_button(screen, msg, buttonLeft, buttonTop, buttonWidth, action=None, ac
     draw_text(screen, msg, x, buttonTop, buttonWidth)
 
 
-def menu_button(screen, msg, buttonTop, action=None):
+def menu_button(screen, msg, buttonTop, action=None, actionParams=None):
     x = (WIDTH - MENUBUTTONWIDTH) // 2
-    draw_button(screen, msg, x, buttonTop,MENUBUTTONWIDTH, action)
+    draw_button(screen, msg, x, buttonTop,MENUBUTTONWIDTH, action,actionParams)
