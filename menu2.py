@@ -6,6 +6,7 @@ from menu_button import *
 from level_chooser import level_chooser
 from main_game import main_cycle
 
+
 def terminate():
     pygame.quit()
     sys.exit()
@@ -37,6 +38,7 @@ def menu_levelGenerator():
     global runningStatus
     runningStatus = "levelchooser"
 
+
 runningStatus = "menu"
 pygame.init()
 clock = pygame.time.Clock()
@@ -52,7 +54,8 @@ while running:
     if runningStatus == "menu":
         menu_buttons()
     elif runningStatus == "game":
-        level_chooser(screen,clock,True)
+        level_chooser(screen, clock, True)
+        screen = pygame.display.set_mode(windowSize)
         runningStatus = "menu"
     elif runningStatus == 'levelchooser':
         try:

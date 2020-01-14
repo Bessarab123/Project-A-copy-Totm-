@@ -22,6 +22,7 @@ def level_chooser(screen, clock, isGameRunning=False):
     def create_new_level(params):
         ev = pygame.event.Event(CREATENEWLEVEL, {'file': params[0], 'size': params[1]})
         pygame.event.post(ev)
+
     def choose_players(params):
         ev = pygame.event.Event(CHOOSEPLAYERS, {'players': params})
         pygame.event.post(ev)
@@ -29,23 +30,24 @@ def level_chooser(screen, clock, isGameRunning=False):
     def menu_level_buttons(top):
         newLevelMsg = 'Create new level'
         if isGameRunning:
-            newLevelMsg = 'Play new level'
+            newLevelMsg = ''
         draw_text(screen, newLevelMsg, 5, top, WIDTH)
-        top += MENUBUTTONHEIGHT * 1.5
         levelButtonWidth = 110
         levelButtonPadding = (WIDTH - 10) // 4
         x = 5
-        draw_button(screen, "Small", x, top, levelButtonWidth, create_new_level, ('', 10))
-        x += levelButtonPadding
-        draw_button(screen, "Medium", x, top, levelButtonWidth, create_new_level, ('', 20))
-        x += levelButtonPadding
-        draw_button(screen, "Large", x, top, levelButtonWidth, create_new_level, ('', 35))
-        x += levelButtonPadding
-        draw_button(screen, "Extralarge", x, top, levelButtonWidth, create_new_level, ('', 50))
+        if not isGameRunning:
+            top += MENUBUTTONHEIGHT * 1.5
+            draw_button(screen, "Small", x, top, levelButtonWidth, create_new_level, ('', 10))
+            x += levelButtonPadding
+            draw_button(screen, "Medium", x, top, levelButtonWidth, create_new_level, ('', 20))
+            x += levelButtonPadding
+            draw_button(screen, "Large", x, top, levelButtonWidth, create_new_level, ('', 35))
+            x += levelButtonPadding
+            draw_button(screen, "Extralarge", x, top, levelButtonWidth, create_new_level, ('', 50))
+            top += MENUBUTTONHEIGHT * 1.5
         onlyfiles = [f for f in listdir('levels') if isfile(join('levels', f))]
         if len(onlyfiles) == 0:
             return
-        top += MENUBUTTONHEIGHT * 1.5
         existingLevelMsg = 'Edit existing levels'
         if isGameRunning:
             existingLevelMsg = 'Play existing levels'
@@ -57,9 +59,9 @@ def level_chooser(screen, clock, isGameRunning=False):
     def menu_player_buttons(top):
         draw_text(screen, 'Choose players', 5, top, WIDTH)
         top += MENUBUTTONHEIGHT * 2
-        menu_button(screen, "One player", top, choose_players,1)
+        draw_button(screen, "One player", WIDTH // 2 + 45, top, MENUBUTTONWIDTH, choose_players, 1)
         top += MENUBUTTONHEIGHT * 1.5
-        menu_button(screen, "Two players", top, choose_players,2)
+        draw_button(screen, "Two players", WIDTH // 2 + 45, top, MENUBUTTONWIDTH, choose_players, 2)
 
     def menu_buttons():
         draw_button(screen, "Back to Menu", 5, 5, MENUBUTTONWIDTH, back_to_mainMenu)
@@ -86,7 +88,7 @@ def level_chooser(screen, clock, isGameRunning=False):
             if event.type == CHOOSEPLAYERS:
                 players = event.players
                 running = False
-                main_cycle(gameFileName, players == 2, gameSize, screen, clock)
+                main_cycle(gameFileName, players == 2, screen, clock)
         pygame.draw.rect(screen, (255, 255, 255), ((0, 0), windowSize))
         menu_buttons()
         pygame.display.flip()

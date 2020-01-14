@@ -13,9 +13,7 @@ FPS = 240
 BLACK = pygame.Color('black')
 
 
-def main_cycle(name_file, two_players, size, screen, clock):
-    width = screen.get_rect().w
-    height = screen.get_rect().h
+def main_cycle(name_file, two_players, screen, clock):
     UPDATE_SPRITES = 30
     pygame.time.set_timer(UPDATE_SPRITES, 1000)
 
@@ -180,6 +178,8 @@ def main_cycle(name_file, two_players, size, screen, clock):
             self.dx = -(x - width // 2)
             self.dy = -(y - height // 2)
 
+    width = screen.get_rect().w
+    height = screen.get_rect().h
     board.render()
     list_cell_pos_enter = list(
         map(lambda x: (x[1] * board.get_cell_size(), x[0] * board.get_cell_size()), enter_sprites_dict.keys()))
@@ -196,7 +196,6 @@ def main_cycle(name_file, two_players, size, screen, clock):
                 all_sprites.update()
             elif pygame.key.get_pressed()[pygame.K_ESCAPE]:
                 screen = pygame.display.set_mode((width, height))
-                return
             elif pygame.key.get_pressed()[pygame.K_f]:
                 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
             # Определить направление движения
@@ -225,6 +224,8 @@ def main_cycle(name_file, two_players, size, screen, clock):
                 elif pygame.key.get_pressed()[pygame.K_a]:
                     if not plr_list[1].move:
                         plr_list[1].set_move(True, 'LEFT')
+        width = screen.get_rect().w
+        height = screen.get_rect().h
 
         if not plr_list[0] is None and pygame.sprite.spritecollide(plr_list[0], wall_group, False):
             # Движение если упёрся в стену
@@ -276,7 +277,6 @@ def main_cycle(name_file, two_players, size, screen, clock):
             camera.update(plr_list[0])
         for sprite in all_sprites:
             camera.apply(sprite)
-
         screen.fill(BLACK)
         all_sprites.draw(screen)
         # Прямоугольник в котором можно работать
