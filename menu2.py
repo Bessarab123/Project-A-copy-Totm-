@@ -17,8 +17,6 @@ def menu_buttons():
     top = (HEIGHT - buttonCount * MENUBUTTONHEIGHT - (buttonCount - 1) * MENUBUTTONHEIGHT // 2) // 2
     menu_button(screen, "Start Game", top, menu_startGame)
     top += MENUBUTTONHEIGHT * 1.5
-    menu_button(screen, "Settings", top, menu_settings)
-    top += MENUBUTTONHEIGHT * 1.5
     menu_button(screen, "Level Generator", top, menu_levelGenerator)
     top += MENUBUTTONHEIGHT * 1.5
     menu_button(screen, "Exit", top, terminate)
