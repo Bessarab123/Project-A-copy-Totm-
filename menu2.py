@@ -6,11 +6,11 @@ from menu_button import *
 from level_chooser import level_chooser
 from main_game import main_cycle
 
+pygame.mixer.init()
 
 def terminate():
     pygame.quit()
     sys.exit()
-
 
 def menu_buttons():
     buttonCount = 4
@@ -46,6 +46,8 @@ running = True
 windowSize = (WIDTH, HEIGHT)
 screen = pygame.display.set_mode(windowSize)
 pygame.font.init()
+pygame.mixer.music.load('super-mario-boss-boss-muzyka-iz-igry-nintendo.mp3')
+pygame.mixer.music.play(-1)
 try:
     open('levels')
 except PermissionError:
