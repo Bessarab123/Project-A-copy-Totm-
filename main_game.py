@@ -203,29 +203,29 @@ def main_cycle(name_file, two_players, screen, clock):
                 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
             # Определить направление движения
             elif pygame.key.get_pressed()[pygame.K_UP]:
-                if not plr_list[0].move:
+                if not plr_list[0] is None and not plr_list[0].move:
                     plr_list[0].set_move(True, 'UP')
             elif pygame.key.get_pressed()[pygame.K_DOWN]:
-                if not plr_list[0].move:
+                if not plr_list[0] is None and not plr_list[0].move:
                     plr_list[0].set_move(True, 'DOWN')
             elif pygame.key.get_pressed()[pygame.K_RIGHT]:
-                if not plr_list[0].move:
+                if not plr_list[0] is None and not plr_list[0].move:
                     plr_list[0].set_move(True, 'RIGHT')
             elif pygame.key.get_pressed()[pygame.K_LEFT]:
-                if not plr_list[0].move:
+                if not plr_list[0] is None and not plr_list[0].move:
                     plr_list[0].set_move(True, 'LEFT')
             if two_players:
                 if pygame.key.get_pressed()[pygame.K_w]:
                     if not plr_list[1].move:
-                        plr_list[1].set_move(True, 'UP')
+                        not plr_list[1] is None and plr_list[1].set_move(True, 'UP')
                 elif pygame.key.get_pressed()[pygame.K_s]:
-                    if not plr_list[1].move:
+                    if not plr_list[1] is None and not plr_list[1].move:
                         plr_list[1].set_move(True, 'DOWN')
                 elif pygame.key.get_pressed()[pygame.K_d]:
-                    if not plr_list[1].move:
+                    if not plr_list[1] is None and not plr_list[1].move:
                         plr_list[1].set_move(True, 'RIGHT')
                 elif pygame.key.get_pressed()[pygame.K_a]:
-                    if not plr_list[1].move:
+                    if not plr_list[1] is None and not plr_list[1].move:
                         plr_list[1].set_move(True, 'LEFT')
         width = screen.get_rect().w
         height = screen.get_rect().h
