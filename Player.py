@@ -1,5 +1,6 @@
 import pygame
 import os
+from consts import STEP
 
 
 def create_player(board, player_pos, flag, player_group, all_sprites):
@@ -43,23 +44,23 @@ def create_player(board, player_pos, flag, player_group, all_sprites):
         def moves(self):
             if self.move:
                 if self.direction == 'RIGHT':
-                    self.rect.x += 1
+                    self.rect.x += STEP
                 elif self.direction == 'LEFT':
-                    self.rect.x -= 1
+                    self.rect.x -= STEP
                 elif self.direction == 'UP':
-                    self.rect.y -= 1
+                    self.rect.y -= STEP
                 elif self.direction == 'DOWN':
-                    self.rect.y += 1
+                    self.rect.y += STEP
 
         def step_back(self):
             if self.direction == 'RIGHT':
-                self.rect.x -= 1
+                self.rect.x -= STEP
             elif self.direction == 'LEFT':
-                self.rect.x += 1
+                self.rect.x += STEP
             elif self.direction == 'UP':
-                self.rect.y += 1
+                self.rect.y += STEP
             elif self.direction == 'DOWN':
-                self.rect.y -= 1
+                self.rect.y -= STEP
 
         def update(self, *args):
             if not self.flag:

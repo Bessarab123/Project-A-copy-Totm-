@@ -9,7 +9,7 @@ ENTER = 2
 EXIT = 3
 COIN = 4
 STEP = 1
-FPS = 240
+FPS = 60
 BLACK = pygame.Color('black')
 
 
@@ -280,7 +280,6 @@ def main_cycle(name_file, two_players, screen, clock):
             elif not plr_list[1] is None:
                 plr_list[1].moves()
                 camera.update(plr_list[1])
-
         else:
             plr_list[0].moves()
             camera.update(plr_list[0])
