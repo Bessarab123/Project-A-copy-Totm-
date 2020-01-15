@@ -46,6 +46,12 @@ running = True
 windowSize = (WIDTH, HEIGHT)
 screen = pygame.display.set_mode(windowSize)
 pygame.font.init()
+try:
+    open('levels')
+except PermissionError:
+    pass
+except FileNotFoundError:
+    os.makedirs('levels')
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -58,12 +64,6 @@ while running:
         screen = pygame.display.set_mode(windowSize)
         runningStatus = "menu"
     elif runningStatus == 'levelchooser':
-        try:
-            open('levels')
-        except PermissionError:
-            pass
-        except FileNotFoundError:
-            os.makedirs('levels')
         level_chooser(screen, clock)
         runningStatus = 'menu'
     else:

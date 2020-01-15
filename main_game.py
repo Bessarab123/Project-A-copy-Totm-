@@ -182,7 +182,7 @@ def main_cycle(name_file, two_players, screen, clock):
     height = screen.get_rect().h
     board.render()
     font = pygame.font.Font(None, 24)
-    point_1 = 0
+    point_1 = 0 # Очки
     list_cell_pos_enter = list(
         map(lambda x: (x[1] * board.get_cell_size(), x[0] * board.get_cell_size()), enter_sprites_dict.keys()))
     plr_list = [create_player(board, random.choice(list_cell_pos_enter), 0, player_group, all_sprites)]
