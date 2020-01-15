@@ -17,7 +17,7 @@ def level_editor(x, y, screen, clock, fileName):
     pygame.time.set_timer(UPDATE_SPRITES, 1000)
     width = screen.get_rect().w
     height = screen.get_rect().h
-    screen = pygame.display.set_mode((2000, 2000), pygame.RESIZABLE)
+    screen = pygame.display.set_mode((max(x * 32, 500), max(y * 32, 500)))
 
     all_sprites = pygame.sprite.Group()
     wall_sprites_dict = dict()
@@ -82,18 +82,18 @@ def level_editor(x, y, screen, clock, fileName):
             press = pygame.key.get_pressed()
             if any(press):
                 # Если нажата хоть одна клавиша
-                if press[pygame.K_0]:
+                if press[pygame.K_w]:
                     self.board[i][j] = 0
-                elif press[pygame.K_1]:
+                elif press[pygame.K_e]:
                     wall_sprites_dict[(i, j)] = []
                     self.board[i][j] = 1
-                elif press[pygame.K_2]:
+                elif press[pygame.K_i]:
                     wall_sprites_dict[(i, j)] = []
                     self.board[i][j] = 2
-                elif press[pygame.K_3]:
+                elif press[pygame.K_o]:
                     wall_sprites_dict[(i, j)] = []
                     self.board[i][j] = 3
-                elif press[pygame.K_4]:
+                elif press[pygame.K_m]:
                     wall_sprites_dict[(i, j)] = []
                     self.board[i][j] = 4
             else:
@@ -137,7 +137,6 @@ def level_editor(x, y, screen, clock, fileName):
                 file = open('levels/new_save_board.txt', mode='w')
                 file.write(board_str)
                 file.close()
-
 
         def open_board(self, name):
             '''Открывает доску из указанного файла'''
@@ -217,6 +216,20 @@ def level_editor(x, y, screen, clock, fileName):
             self.image = Coin.coin_im
 
     board.render()
+    font = pygame.font.Font(None, 24)
+    text = ["Справка:",
+            "Переключение осуществляется кнопками мышки",
+            "Зажмите W и нажимайте мышкой чтобы поставить стену",
+            "Зажмите E и нажимайте мышкой чтобы очистить клетку",
+            "Зажмите I и нажимайте мышкой чтобы поставить вход",
+            "Зажмите O и нажимайте мышкой чтобы поставить выход",
+            "Зажмите M и нажимайте мышкой чтобы поставить монетку",
+            "Нажмите ctrl + s чтобы сохранить уровень",
+            "Для перемещения доски используйте стрелочка",
+            "Нажмите R чтобы вернуть доску в стартовое положение",
+            "Нажмите Tab чтобы скрыть справку"]
+    text = list(map(lambda x: font.render(x, 10, (255, 255, 255)), text))
+    reference = True
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -239,15 +252,21 @@ def level_editor(x, y, screen, clock, fileName):
                     board.move_board('LEFT')
                 elif pygame.key.get_pressed()[pygame.K_r]:
                     board.move_board('remove')
+                elif pygame.key.get_pressed()[pygame.K_TAB]:
+                    reference = not reference
                 elif pygame.key.get_pressed()[pygame.K_ESCAPE]:
                     pygame.display.set_mode((width, height))
                     return
-
         screen.fill(BLACK)
-        all_sprites.draw(screen)
         # Прямоугольник в котором можно работать
         pygame.draw.rect(screen, (139, 0, 255),
                          [board.x, board.y,
                           board.cell_size * board.width, board.height * board.cell_size], 1)
+        if reference:
+            y = 0
+            for t in text:
+                screen.blit(t, (0, y))
+                y += 24
+        all_sprites.draw(screen)
         clock.tick(60)
         pygame.display.flip()

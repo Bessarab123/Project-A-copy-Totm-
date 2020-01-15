@@ -181,11 +181,14 @@ def main_cycle(name_file, two_players, screen, clock):
     width = screen.get_rect().w
     height = screen.get_rect().h
     board.render()
+    font = pygame.font.Font(None, 24)
+    point_1 = 0
     list_cell_pos_enter = list(
         map(lambda x: (x[1] * board.get_cell_size(), x[0] * board.get_cell_size()), enter_sprites_dict.keys()))
     plr_list = [create_player(board, random.choice(list_cell_pos_enter), 0, player_group, all_sprites)]
     if two_players:
         # Если два игрока
+        point_2 = 0
         plr_list.append(create_player(board, random.choice(list_cell_pos_enter), 1, player_group, all_sprites))
     camera = Camera()
     while True:
@@ -240,8 +243,10 @@ def main_cycle(name_file, two_players, screen, clock):
             if not plr_list[0] is None and pygame.sprite.collide_mask(plr_list[0], coin):
                 coin.kill()
                 # Можно вести подсчёт очков
+                point_1 += 1
             if two_players and not plr_list[1] is None and pygame.sprite.collide_mask(plr_list[1], coin):
                 coin.kill()
+                point_2 += 1
 
         for exit in exit_group:
             # Вышли ли игроки
@@ -255,7 +260,11 @@ def main_cycle(name_file, two_players, screen, clock):
                 plr_list[1].kill()
                 plr_list[1] = None
 
+        screen.fill(BLACK)
+        screen.blit(font.render(str(point_1), 0, (255, 255, 0)), (0, 0))
         if two_players:
+            f = font.render(str(point_2), 0, (0, 0, 255))
+            screen.blit(f, (width - f.get_rect().w, 0))
             # Обработка движения для 2 игроков
             if not plr_list[0] is None and not plr_list[1] is None:
                 plr_list[0].moves()
@@ -277,7 +286,6 @@ def main_cycle(name_file, two_players, screen, clock):
             camera.update(plr_list[0])
         for sprite in all_sprites:
             camera.apply(sprite)
-        screen.fill(BLACK)
         all_sprites.draw(screen)
         # Прямоугольник в котором можно работать
         clock.tick(FPS)
