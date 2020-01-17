@@ -266,7 +266,8 @@ def level_editor(size, screen, clock, file_name):
         if reference:
             y = 0
             for t in text:
-                screen.blit(t, (board.get_cell_size() * board.width // 2 - t.get_rect().w // 2, y))
+                x = board.get_cell_size() * board.width // 2 - t.get_rect().w // 2
+                screen.blit(t, (0 if x - width // 2 < 0 else x, y))
                 y += 24
         all_sprites.draw(screen)
         clock.tick(60)
