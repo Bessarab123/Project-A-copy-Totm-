@@ -3,15 +3,9 @@ from consts import UPDATE_SPRITES
 import pygame
 import os
 import random
+from consts import WALL, ENTER, EMPTY, EXIT, COIN, STEP, BLACK
 
-WALL = 0
-EMPTY = 1
-ENTER = 2
-EXIT = 3
-COIN = 4
-STEP = 1
 FPS = 60
-BLACK = pygame.Color('black')
 
 
 def main_cycle(name_file, two_players, screen, clock):
