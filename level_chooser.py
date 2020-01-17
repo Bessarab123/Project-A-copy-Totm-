@@ -1,19 +1,18 @@
 import pygame
 from os import listdir
 from os.path import isfile, join
-import sys
 from menu_button import *
 from consts import *
 from level_editor import level_editor
 from main_game import main_cycle
 
 
-def level_chooser(screen, clock, isGameRunning=False):
-    windowSize = (WIDTH, HEIGHT)
+def level_chooser(screen, clock, is_game_running=False):
+    window_size = (WIDTH, HEIGHT)
     running = True
-    isPlayerChooser = False
-    gameFileName = ''
-    gameSize = 10
+    is_player_chooser = False
+    game_file_name = ''
+    game_size = 10
 
     def back_to_mainMenu():
         ev = pygame.event.Event(GOTOMAINMENU)
@@ -28,30 +27,30 @@ def level_chooser(screen, clock, isGameRunning=False):
         pygame.event.post(ev)
 
     def menu_level_buttons(top):
-        newLevelMsg = 'Create new level'
-        if isGameRunning:
-            newLevelMsg = ''
-        draw_text(screen, newLevelMsg, 5, top, WIDTH)
-        levelButtonWidth = 110
-        levelButtonPadding = (WIDTH - 10) // 4
+        new_level_msg = 'Create new level'
+        if is_game_running:
+            new_level_msg = ''
+        draw_text(screen, new_level_msg, 5, top, WIDTH)
+        level_button_width = 110
+        level_button_padding = (WIDTH - 10) // 4
         x = 5
-        if not isGameRunning:
+        if not is_game_running:
             top += MENUBUTTONHEIGHT * 1.5
-            draw_button(screen, "Small", x, top, levelButtonWidth, create_new_level, ('', 10))
-            x += levelButtonPadding
-            draw_button(screen, "Medium", x, top, levelButtonWidth, create_new_level, ('', 20))
-            x += levelButtonPadding
-            draw_button(screen, "Large", x, top, levelButtonWidth, create_new_level, ('', 35))
-            x += levelButtonPadding
-            draw_button(screen, "Extralarge", x, top, levelButtonWidth, create_new_level, ('', 50))
+            draw_button(screen, "Small", x, top, level_button_width, create_new_level, ('', 10))
+            x += level_button_padding
+            draw_button(screen, "Medium", x, top, level_button_width, create_new_level, ('', 20))
+            x += level_button_padding
+            draw_button(screen, "Large", x, top, level_button_width, create_new_level, ('', 35))
+            x += level_button_padding
+            draw_button(screen, "Extralarge", x, top, level_button_width, create_new_level, ('', 50))
             top += MENUBUTTONHEIGHT * 1.5
         onlyfiles = [f for f in listdir('levels') if isfile(join('levels', f))]
         if len(onlyfiles) == 0:
             return
-        existingLevelMsg = 'Edit existing levels'
-        if isGameRunning:
-            existingLevelMsg = 'Play existing levels'
-        draw_text(screen, existingLevelMsg, 5, top, WIDTH)
+        existing_level_msg = 'Edit existing levels'
+        if is_game_running:
+            existing_level_msg = 'Play existing levels'
+        draw_text(screen, existing_level_msg, 5, top, WIDTH)
         for file in onlyfiles:
             top += MENUBUTTONHEIGHT * 1.5
             draw_button(screen, file, 5, top, MENUBUTTONWIDTH, create_new_level, (file, 0))
@@ -66,7 +65,7 @@ def level_chooser(screen, clock, isGameRunning=False):
     def menu_buttons():
         draw_button(screen, "Back to Menu", 5, 5, MENUBUTTONWIDTH, back_to_mainMenu)
         top = MENUBUTTONHEIGHT * 1.5 + 5
-        if isPlayerChooser:
+        if is_player_chooser:
             menu_player_buttons(top)
         else:
             menu_level_buttons(top)
@@ -78,17 +77,17 @@ def level_chooser(screen, clock, isGameRunning=False):
             if event.type == GOTOMAINMENU:
                 running = False
             if event.type == CREATENEWLEVEL:
-                gameFileName = event.file
-                gameSize = event.size
-                if isGameRunning:
-                    isPlayerChooser = True
+                game_file_name = event.file
+                game_size = event.size
+                if is_game_running:
+                    is_player_chooser = True
                 else:
                     running = False
-                    level_editor(gameSize, gameSize, screen, clock, gameFileName)
+                    level_editor(game_size, screen, clock, game_file_name)
             if event.type == CHOOSEPLAYERS:
                 players = event.players
                 running = False
-                main_cycle(gameFileName, players == 2, screen, clock)
-        pygame.draw.rect(screen, (255, 255, 255), ((0, 0), windowSize))
+                main_cycle(game_file_name, players == 2, screen, clock)
+        pygame.draw.rect(screen, (255, 255, 255), ((0, 0), window_size))
         menu_buttons()
         pygame.display.flip()

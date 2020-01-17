@@ -1,23 +1,17 @@
 import pygame
 import os
 import random
+from consts import WALL, EXIT, ENTER, COIN, BLACK, EMPTY, UPDATE_SPRITES
 
 
-def level_editor(x, y, screen, clock, fileName):
+def level_editor(size, screen, clock, file_name):
     '''Создать редактор уровня принимает
     x, y размеры поля
     screen, clock'''
-    WALL = 0
-    EMPTY = 1
-    ENTER = 2
-    EXIT = 3
-    COIN = 4
-    BLACK = pygame.Color('black')
-    UPDATE_SPRITES = 30
     pygame.time.set_timer(UPDATE_SPRITES, 1000)
     width = screen.get_rect().w
     height = screen.get_rect().h
-    screen = pygame.display.set_mode((max(x * 32, 500), max(y * 32, 500)))
+    screen = pygame.display.set_mode((max(size * 32, 500), max(size * 32, 500)))
 
     all_sprites = pygame.sprite.Group()
     wall_sprites_dict = dict()
@@ -129,8 +123,8 @@ def level_editor(x, y, screen, clock, fileName):
         def save_board(self):
             '''Сохраняет доску в "levels/new_save_board.txt или в fileName"'''
             board_str = '\n'.join(list(map(lambda x: ' '.join(map(str, x)), self.board)))
-            if fileName != '':
-                file = open('levels/' + fileName, mode='w')
+            if file_name != '':
+                file = open('levels/' + file_name, mode='w')
                 file.write(board_str)
                 file.close()
             else:
@@ -160,9 +154,9 @@ def level_editor(x, y, screen, clock, fileName):
                 self.y = 0
             self.render()
 
-    board = BoardEditor(x, y)
-    if fileName != '':
-        board.open_board(fileName)
+    board = BoardEditor(size, size)
+    if file_name != '':
+        board.open_board(file_name)
 
     class Sprites(pygame.sprite.Sprite):
         '''Общий класс всех спрайтов'''
@@ -209,11 +203,18 @@ def level_editor(x, y, screen, clock, fileName):
 
     class Coin(Sprites):
         '''Класс монетки'''
-        coin_im = load_image('coin.png')
+        coin_im_1 = load_image('coin_1.png')
+        coin_im_2 = load_image('coin_2.png')
 
         def __init__(self, x, y, *group):
             super().__init__(x, y, group)
-            self.image = Coin.coin_im
+            self.image = Coin.coin_im_1
+
+        def update(self, *args):
+            if self.image is Coin.coin_im_1:
+                self.image = Coin.coin_im_2
+            else:
+                self.image = Coin.coin_im_1
 
     board.render()
     font = pygame.font.Font(None, 24)
@@ -261,11 +262,11 @@ def level_editor(x, y, screen, clock, fileName):
         # Прямоугольник в котором можно работать
         pygame.draw.rect(screen, (139, 0, 255),
                          [board.x, board.y,
-                          board.cell_size * board.width, board.height * board.cell_size], 1)
+                          board.get_cell_size() * board.width, board.height * board.get_cell_size()], 1)
         if reference:
             y = 0
             for t in text:
-                screen.blit(t, (0, y))
+                screen.blit(t, (board.get_cell_size() * board.width // 2 - t.get_rect().w // 2, y))
                 y += 24
         all_sprites.draw(screen)
         clock.tick(60)

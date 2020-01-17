@@ -1,44 +1,38 @@
 import pygame
 import sys
 import os
-from consts import *
 from menu_button import *
 from level_chooser import level_chooser
-from main_game import main_cycle
 
-pygame.mixer.init()
 
 def terminate():
     pygame.quit()
     sys.exit()
 
+
 def menu_buttons():
-    buttonCount = 4
-    top = (HEIGHT - buttonCount * MENUBUTTONHEIGHT - (buttonCount - 1) * MENUBUTTONHEIGHT // 2) // 2
-    menu_button(screen, "Start Game", top, menu_startGame)
+    button_count = 4
+    top = (HEIGHT - button_count * MENUBUTTONHEIGHT - (button_count - 1) * MENUBUTTONHEIGHT // 2) // 2
+    menu_button(screen, "Start Game", top, menu_start_game)
     top += MENUBUTTONHEIGHT * 1.5
-    menu_button(screen, "Level Generator", top, menu_levelGenerator)
+    menu_button(screen, "Level Generator", top, menu_level_generator)
     top += MENUBUTTONHEIGHT * 1.5
     menu_button(screen, "Exit", top, terminate)
 
 
-def menu_startGame():
+def menu_start_game():
     global runningStatus
     runningStatus = "game"
 
 
-def menu_settings():
-    global runningStatus
-    runningStatus = "settings"
-
-
-def menu_levelGenerator():
+def menu_level_generator():
     global runningStatus
     runningStatus = "levelchooser"
 
 
-runningStatus = "menu"
 pygame.init()
+pygame.mixer.init()
+runningStatus = "menu"
 clock = pygame.time.Clock()
 running = True
 windowSize = (WIDTH, HEIGHT)
@@ -67,7 +61,6 @@ while running:
         level_chooser(screen, clock)
         runningStatus = 'menu'
     else:
-        # game code runningStatus == game or settings or levelgenerator
         pygame.draw.rect(screen, (155, 155, 155), ((0, 0), windowSize))
 
     pygame.display.flip()

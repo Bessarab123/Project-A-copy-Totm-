@@ -1,4 +1,5 @@
 from Player import create_player
+from consts import UPDATE_SPRITES
 import pygame
 import os
 import random
@@ -14,8 +15,7 @@ BLACK = pygame.Color('black')
 
 
 def main_cycle(name_file, two_players, screen, clock):
-    UPDATE_SPRITES = 30
-    pygame.time.set_timer(UPDATE_SPRITES, 1000)
+    pygame.time.set_timer(UPDATE_SPRITES, 800)
 
     all_sprites = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
@@ -95,7 +95,9 @@ def main_cycle(name_file, two_players, screen, clock):
         def open_board(self, name):
             '''Открывает доску из указанного файла'''
             file = open('levels/' + name)
-            self.board = list(map(lambda x: list(map(int, x.split())), file.read().split('\n')))
+            board = list(map(lambda x: list(map(int, x.split())), file.read().split('\n')))
+            board = list(map(lambda x: [0] + x + [0], [len(board[0]) * [0]] + board[:] + [len(board[0]) * [0]]))
+            self.board = board
             self.width = len(self.board[0])
             self.height = len(self.board)
             file.close()
@@ -151,12 +153,18 @@ def main_cycle(name_file, two_players, screen, clock):
 
     class Coin(Sprites):
         '''Класс монетки'''
-        coin_im = load_image('coin.png')
+        coin_im_1 = load_image('coin_1.png')
+        coin_im_2 = load_image('coin_2.png')
 
         def __init__(self, x, y, *group):
             super().__init__(x, y, group)
-            self.image = Coin.coin_im
-            self.mask = pygame.mask.from_surface(self.image)
+            self.image = Coin.coin_im_1
+
+        def update(self, *args):
+            if self.image is Coin.coin_im_1:
+                self.image = Coin.coin_im_2
+            else:
+                self.image = Coin.coin_im_1
 
     class Camera:
         # зададим начальный сдвиг камеры
@@ -182,7 +190,7 @@ def main_cycle(name_file, two_players, screen, clock):
     height = screen.get_rect().h
     board.render()
     font = pygame.font.Font(None, 24)
-    point_1 = 0 # Очки
+    point_1 = 0  # Очки
     list_cell_pos_enter = list(
         map(lambda x: (x[1] * board.get_cell_size(), x[0] * board.get_cell_size()), enter_sprites_dict.keys()))
     plr_list = [create_player(board, random.choice(list_cell_pos_enter), 0, player_group, all_sprites)]
@@ -205,28 +213,36 @@ def main_cycle(name_file, two_players, screen, clock):
             elif pygame.key.get_pressed()[pygame.K_UP]:
                 if not plr_list[0] is None and not plr_list[0].move:
                     plr_list[0].set_move(True, 'UP')
+                    player_group.update()
             elif pygame.key.get_pressed()[pygame.K_DOWN]:
                 if not plr_list[0] is None and not plr_list[0].move:
                     plr_list[0].set_move(True, 'DOWN')
+                    player_group.update()
             elif pygame.key.get_pressed()[pygame.K_RIGHT]:
                 if not plr_list[0] is None and not plr_list[0].move:
                     plr_list[0].set_move(True, 'RIGHT')
+                    player_group.update()
             elif pygame.key.get_pressed()[pygame.K_LEFT]:
                 if not plr_list[0] is None and not plr_list[0].move:
                     plr_list[0].set_move(True, 'LEFT')
+                    player_group.update()
             if two_players:
                 if pygame.key.get_pressed()[pygame.K_w]:
-                    if not plr_list[1].move:
-                        not plr_list[1] is None and plr_list[1].set_move(True, 'UP')
+                    if not plr_list[1] is None and not plr_list[1].move:
+                        plr_list[1].set_move(True, 'UP')
+                        player_group.update()
                 elif pygame.key.get_pressed()[pygame.K_s]:
                     if not plr_list[1] is None and not plr_list[1].move:
                         plr_list[1].set_move(True, 'DOWN')
+                        player_group.update()
                 elif pygame.key.get_pressed()[pygame.K_d]:
                     if not plr_list[1] is None and not plr_list[1].move:
                         plr_list[1].set_move(True, 'RIGHT')
+                        player_group.update()
                 elif pygame.key.get_pressed()[pygame.K_a]:
                     if not plr_list[1] is None and not plr_list[1].move:
                         plr_list[1].set_move(True, 'LEFT')
+                        player_group.update()
         width = screen.get_rect().w
         height = screen.get_rect().h
 

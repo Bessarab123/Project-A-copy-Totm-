@@ -23,7 +23,7 @@ def draw_button(screen, msg, buttonLeft, buttonTop, buttonWidth, action=None, ac
     x = buttonLeft
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
-    if x +  buttonWidth > mouse[0] > x and buttonTop + MENUBUTTONHEIGHT > mouse[1] > buttonTop:
+    if x + buttonWidth > mouse[0] > x and buttonTop + MENUBUTTONHEIGHT > mouse[1] > buttonTop:
         pygame.draw.rect(screen, MENUACTIVECOLOR, (x, buttonTop, buttonWidth, MENUBUTTONHEIGHT))
 
         if click[0] == 1 and action != None:
@@ -38,4 +38,4 @@ def draw_button(screen, msg, buttonLeft, buttonTop, buttonWidth, action=None, ac
 
 def menu_button(screen, msg, buttonTop, action=None, actionParams=None):
     x = (WIDTH - MENUBUTTONWIDTH) // 2
-    draw_button(screen, msg, x, buttonTop,MENUBUTTONWIDTH, action,actionParams)
+    draw_button(screen, msg, x, buttonTop, MENUBUTTONWIDTH, action, actionParams)
