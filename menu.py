@@ -38,7 +38,7 @@ running = True
 windowSize = (WIDTH, HEIGHT)
 screen = pygame.display.set_mode(windowSize)
 pygame.font.init()
-pygame.mixer.music.load('super-mario-boss-boss-muzyka-iz-igry-nintendo.mp3')
+pygame.mixer.music.load('Gaming 8-Bit.mp3')
 pygame.mixer.music.play(-1)
 try:
     open('levels')
@@ -50,7 +50,7 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             terminate()
-    pygame.draw.rect(screen, (255, 255, 255), ((0, 0), windowSize))
+    pygame.draw.rect(screen, (137, 0, 255), ((0, 0), windowSize))
     if runningStatus == "menu":
         menu_buttons()
     elif runningStatus == "game":

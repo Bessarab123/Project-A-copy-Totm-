@@ -88,6 +88,6 @@ def level_chooser(screen, clock, is_game_running=False):
                 players = event.players
                 running = False
                 main_cycle(game_file_name, players == 2, screen, clock)
-        pygame.draw.rect(screen, (255, 255, 255), ((0, 0), window_size))
+        pygame.draw.rect(screen, (137, 0, 255), ((0, 0), window_size))
         menu_buttons()
         pygame.display.flip()

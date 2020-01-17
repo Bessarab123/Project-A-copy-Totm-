@@ -1,4 +1,4 @@
-from Player import create_player
+from player import create_player
 from consts import UPDATE_SPRITES
 import pygame
 import os
