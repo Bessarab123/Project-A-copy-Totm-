@@ -1,23 +1,15 @@
-from Player import create_player
+from player import create_player
+from consts import UPDATE_SPRITES
 import pygame
 import os
 import random
+from consts import WALL, ENTER, EMPTY, EXIT, COIN, STEP, BLACK
 
-WALL = 0
-EMPTY = 1
-ENTER = 2
-EXIT = 3
-COIN = 4
-STEP = 1
-FPS = 240
-BLACK = pygame.Color('black')
+FPS = 60
 
 
 def main_cycle(name_file, two_players, screen, clock):
-    width = screen.get_rect().w
-    height = screen.get_rect().h
-    UPDATE_SPRITES = 30
-    pygame.time.set_timer(UPDATE_SPRITES, 1000)
+    pygame.time.set_timer(UPDATE_SPRITES, 800)
 
     all_sprites = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
@@ -97,7 +89,9 @@ def main_cycle(name_file, two_players, screen, clock):
         def open_board(self, name):
             '''Открывает доску из указанного файла'''
             file = open('levels/' + name)
-            self.board = list(map(lambda x: list(map(int, x.split())), file.read().split('\n')))
+            board = list(map(lambda x: list(map(int, x.split())), file.read().split('\n')))
+            board = list(map(lambda x: [0] + x + [0], [len(board[0]) * [0]] + board[:] + [len(board[0]) * [0]]))
+            self.board = board
             self.width = len(self.board[0])
             self.height = len(self.board)
             file.close()
@@ -153,12 +147,18 @@ def main_cycle(name_file, two_players, screen, clock):
 
     class Coin(Sprites):
         '''Класс монетки'''
-        coin_im = load_image('coin.png')
+        coin_im_1 = load_image('coin_1.png')
+        coin_im_2 = load_image('coin_2.png')
 
         def __init__(self, x, y, *group):
             super().__init__(x, y, group)
-            self.image = Coin.coin_im
-            self.mask = pygame.mask.from_surface(self.image)
+            self.image = Coin.coin_im_1
+
+        def update(self, *args):
+            if self.image is Coin.coin_im_1:
+                self.image = Coin.coin_im_2
+            else:
+                self.image = Coin.coin_im_1
 
     class Camera:
         # зададим начальный сдвиг камеры
@@ -180,12 +180,17 @@ def main_cycle(name_file, two_players, screen, clock):
             self.dx = -(x - width // 2)
             self.dy = -(y - height // 2)
 
+    width = screen.get_rect().w
+    height = screen.get_rect().h
     board.render()
+    font = pygame.font.Font(None, 24)
+    point_1 = 0  # Очки
     list_cell_pos_enter = list(
         map(lambda x: (x[1] * board.get_cell_size(), x[0] * board.get_cell_size()), enter_sprites_dict.keys()))
     plr_list = [create_player(board, random.choice(list_cell_pos_enter), 0, player_group, all_sprites)]
     if two_players:
         # Если два игрока
+        point_2 = 0
         plr_list.append(create_player(board, random.choice(list_cell_pos_enter), 1, player_group, all_sprites))
     camera = Camera()
     while True:
@@ -196,35 +201,44 @@ def main_cycle(name_file, two_players, screen, clock):
                 all_sprites.update()
             elif pygame.key.get_pressed()[pygame.K_ESCAPE]:
                 screen = pygame.display.set_mode((width, height))
-                return
             elif pygame.key.get_pressed()[pygame.K_f]:
                 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
             # Определить направление движения
             elif pygame.key.get_pressed()[pygame.K_UP]:
-                if not plr_list[0].move:
+                if not plr_list[0] is None and not plr_list[0].move:
                     plr_list[0].set_move(True, 'UP')
+                    player_group.update()
             elif pygame.key.get_pressed()[pygame.K_DOWN]:
-                if not plr_list[0].move:
+                if not plr_list[0] is None and not plr_list[0].move:
                     plr_list[0].set_move(True, 'DOWN')
+                    player_group.update()
             elif pygame.key.get_pressed()[pygame.K_RIGHT]:
-                if not plr_list[0].move:
+                if not plr_list[0] is None and not plr_list[0].move:
                     plr_list[0].set_move(True, 'RIGHT')
+                    player_group.update()
             elif pygame.key.get_pressed()[pygame.K_LEFT]:
-                if not plr_list[0].move:
+                if not plr_list[0] is None and not plr_list[0].move:
                     plr_list[0].set_move(True, 'LEFT')
+                    player_group.update()
             if two_players:
                 if pygame.key.get_pressed()[pygame.K_w]:
-                    if not plr_list[1].move:
+                    if not plr_list[1] is None and not plr_list[1].move:
                         plr_list[1].set_move(True, 'UP')
+                        player_group.update()
                 elif pygame.key.get_pressed()[pygame.K_s]:
-                    if not plr_list[1].move:
+                    if not plr_list[1] is None and not plr_list[1].move:
                         plr_list[1].set_move(True, 'DOWN')
+                        player_group.update()
                 elif pygame.key.get_pressed()[pygame.K_d]:
-                    if not plr_list[1].move:
+                    if not plr_list[1] is None and not plr_list[1].move:
                         plr_list[1].set_move(True, 'RIGHT')
+                        player_group.update()
                 elif pygame.key.get_pressed()[pygame.K_a]:
-                    if not plr_list[1].move:
+                    if not plr_list[1] is None and not plr_list[1].move:
                         plr_list[1].set_move(True, 'LEFT')
+                        player_group.update()
+        width = screen.get_rect().w
+        height = screen.get_rect().h
 
         if not plr_list[0] is None and pygame.sprite.spritecollide(plr_list[0], wall_group, False):
             # Движение если упёрся в стену
@@ -239,8 +253,10 @@ def main_cycle(name_file, two_players, screen, clock):
             if not plr_list[0] is None and pygame.sprite.collide_mask(plr_list[0], coin):
                 coin.kill()
                 # Можно вести подсчёт очков
+                point_1 += 1
             if two_players and not plr_list[1] is None and pygame.sprite.collide_mask(plr_list[1], coin):
                 coin.kill()
+                point_2 += 1
 
         for exit in exit_group:
             # Вышли ли игроки
@@ -254,7 +270,11 @@ def main_cycle(name_file, two_players, screen, clock):
                 plr_list[1].kill()
                 plr_list[1] = None
 
+        screen.fill(BLACK)
+        screen.blit(font.render(str(point_1), 0, (255, 255, 0)), (0, 0))
         if two_players:
+            f = font.render(str(point_2), 0, (0, 0, 255))
+            screen.blit(f, (width - f.get_rect().w, 0))
             # Обработка движения для 2 игроков
             if not plr_list[0] is None and not plr_list[1] is None:
                 plr_list[0].moves()
@@ -270,14 +290,11 @@ def main_cycle(name_file, two_players, screen, clock):
             elif not plr_list[1] is None:
                 plr_list[1].moves()
                 camera.update(plr_list[1])
-
         else:
             plr_list[0].moves()
             camera.update(plr_list[0])
         for sprite in all_sprites:
             camera.apply(sprite)
-
-        screen.fill(BLACK)
         all_sprites.draw(screen)
         # Прямоугольник в котором можно работать
         clock.tick(FPS)
